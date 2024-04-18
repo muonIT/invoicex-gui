@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (QMainWindow, QAction, QFileDialog, QLineEdit,
                              QDialog, QComboBox)
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt, QEvent
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from PyPDF2.generic import IndirectObject
 
 from .populate import PopulateFieldClass
@@ -424,7 +424,7 @@ class InvoiceX(QMainWindow):
 
     def check_xml_for_pdf(self):
         """Look for XML in PDF"""
-        pdf = PdfFileReader(self.fileName[0])
+        pdf = PdfReader(self.fileName[0])
         pdf_root = pdf.trailer['/Root']
         if '/Names' not in pdf_root or '/EmbeddedFiles' not in \
                 pdf_root['/Names']:
@@ -432,9 +432,9 @@ class InvoiceX(QMainWindow):
 
         for file in pdf_root['/Names']['/EmbeddedFiles']['/Names']:
             if isinstance(file, IndirectObject):
-                obj = file.getObject()
+                obj = file.get_object()
                 if obj['/F'] in xml_flavor.valid_xmp_filenames():
-                    xml_root = etree.fromstring(obj['/EF']['/F'].getData())
+                    xml_root = etree.fromstring(obj['/EF']['/F'].get_data())
                     xml_content = xml_root
         return xml_content
 
@@ -511,11 +511,11 @@ class InvoiceX(QMainWindow):
                 '/output.%s' % outputformat,
                 "%s (*.%s)" % (outputformat, outputformat))
             if self.exportFileName[0]:
-                if outputformat is "json":
+                if outputformat == "json":
                     self.pdf_write_json(self.exportFileName[0])
-                elif outputformat is "xml":
+                elif outputformat == "xml":
                     self.pdf_write_xml(self.exportFileName[0])
-                elif outputformat is "yml":
+                elif outputformat == "yml":
                     self.pdf_write_yml(self.exportFileName[0])
         else:
             QMessageBox.critical(self, 'File Not Found',

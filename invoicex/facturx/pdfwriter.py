@@ -38,7 +38,7 @@ from io import BytesIO
 from lxml import etree
 from tempfile import NamedTemporaryFile
 from datetime import datetime
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfFileWriter, PdfReader
 from PyPDF2.generic import DictionaryObject, DecodedStreamObject,\
     NameObject, createStringObject, ArrayObject, IndirectObject
 from pkg_resources import resource_filename
@@ -63,7 +63,7 @@ class FacturXPDFWriter(PdfFileWriter):
         # TODO: Can handle str/paths and ByteIO?
         self.factx = facturx
 
-        original_pdf = PdfFileReader(facturx.pdf)
+        original_pdf = PdfReader(facturx.pdf)
         # Extract /OutputIntents obj from original invoice
         output_intents = _get_original_output_intents(original_pdf)
         self.appendPagesFromReader(original_pdf)
@@ -522,10 +522,10 @@ def _get_original_output_intents(original_pdf):
         ori_output_intents = pdf_root['/OutputIntents']
         logger.debug('output_intents_list=%s', ori_output_intents)
         for ori_output_intent in ori_output_intents:
-            ori_output_intent_dict = ori_output_intent.getObject()
+            ori_output_intent_dict = ori_output_intent.get_Object()
             logger.debug('ori_output_intents_dict=%s', ori_output_intent_dict)
             dest_output_profile_dict =\
-                ori_output_intent_dict['/DestOutputProfile'].getObject()
+                ori_output_intent_dict['/DestOutputProfile'].get_Object()
             output_intents.append(
                 (ori_output_intent_dict, dest_output_profile_dict))
     except:

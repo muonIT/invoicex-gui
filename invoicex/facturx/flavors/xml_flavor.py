@@ -22,7 +22,8 @@ unicode = str
 # Load information on different XML standards and paths from YML.
 def _load_yml(filename):
     with open(os.path.join(os.path.dirname(__file__), filename)) as f:
-        return yaml.load(f)
+
+        return yaml.load(f, Loader=yaml.Loader)
 
 FIELDS = _load_yml('fields.yml')
 FLAVORS = _load_yml('flavors.yml')

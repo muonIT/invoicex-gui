@@ -9,7 +9,7 @@ from datetime import datetime
 import os.path
 import mimetypes
 import hashlib
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from PyPDF2.generic import IndirectObject
 import json
 
@@ -77,7 +77,7 @@ class FacturX(object):
         pass
 
     def _xml_from_file(self, pdf_file):
-        pdf = PdfFileReader(pdf_file)
+        pdf = PdfReader(pdf_file)
         pdf_root = pdf.trailer['/Root']
         if '/Names' not in pdf_root or '/EmbeddedFiles' not in pdf_root['/Names']:
             logger.info('No existing XML file found.')
@@ -85,9 +85,9 @@ class FacturX(object):
 
         for file in pdf_root['/Names']['/EmbeddedFiles']['/Names']:
             if isinstance(file, IndirectObject):
-                obj = file.getObject()
+                obj = file.get_object()
                 if obj['/F'] in xml_flavor.valid_xmp_filenames():
-                    xml_root = etree.fromstring(obj['/EF']['/F'].getData())
+                    xml_root = etree.fromstring(obj['/EF']['/F'].get_data())
                     xml_content = xml_root
                     xml_filename = obj['/F']
                     logger.info(
@@ -137,6 +137,7 @@ class FacturX(object):
         # Check for required fields
         fields_data = xml_flavor.FIELDS
         for field in fields_data.keys():
+            print(field)
             if fields_data[field]['_required']:
                 r = self.xml.xpath(fields_data[field]['_path'][self.flavor.name], namespaces=self._namespaces)
                 if not len(r):
