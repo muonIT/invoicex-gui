@@ -60,6 +60,9 @@ class InvoiceX(QMainWindow):
                                               'icons/logo.ico')))
         self.show()
 
+        local_path = os.path.abspath("../../bin")  # Absoluten Pfad ermitteln
+        os.environ["PATH"] += os.pathsep + local_path  # Dem PATH-Umgebungsvariable hinzufügen
+
         if not spawn.find_executable('convert'):
             QMessageBox.critical(self, 'Import Error',
                                  "Imagemagick is not installed",
